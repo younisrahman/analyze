@@ -1,20 +1,8 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Platform,
-  Alert,
-  TouchableOpacity,
-} from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useSelector } from 'react-redux';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { FilterCard } from '../../components';
-import { RootStackParamList } from '../../../types';
 import { Colors, hp, wp } from '../../utils';
-import { RootState } from '../../store';
-type HomeProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
-function HomeScreen({ navigation }: HomeProps) {
+function HomeScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.headerShadow}>
