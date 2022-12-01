@@ -8,15 +8,22 @@ type ProfileUrl = {
   name: string;
   id: string;
   status: string;
+  index: number;
 };
 const ProfileCard = ({
   url = 'https://chaldal.tech/assignment-assets/gabriel-silverio-u3WmDyKGsrY-unsplash.jpg',
   name = 'Cynthia',
   id = '1234567',
   status = 'Active',
+  index,
 }: ProfileUrl) => {
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { marginLeft: index & (1 === 1) ? wp(10.5) : 0 },
+      ]}
+    >
       <Image
         style={styles.ImageStyle}
         resizeMode={'contain'}

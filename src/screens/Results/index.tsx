@@ -1,5 +1,12 @@
 import * as React from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  Button,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+} from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Ionicons, Entypo } from '@expo/vector-icons';
 
@@ -9,8 +16,11 @@ import { TextinputWithIcon } from '../../components';
 import ProfileCard from './ProfileCard';
 import FilterModal from './FiltarModal';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
 type DetailsProps = NativeStackScreenProps<RootStackParamList, 'Results'>;
 function DetailsScreen({ navigation }: DetailsProps) {
+  const { filterUser } = useSelector((state: RootState) => state.FilteredUser);
   const [show, setshow] = useState(false);
   return (
     <View style={styles.container}>
@@ -45,11 +55,20 @@ function DetailsScreen({ navigation }: DetailsProps) {
           textContainer={styles.textContainer}
         />
 
-        <ProfileCard
-          name='Cynthia Ahmed'
-          id='13208978'
-          url='https://chaldal.tech/assignment-assets/gabriel-silverio-u3WmDyKGsrY-unsplash.jpg'
-          status='Active'
+        <FlatList
+          data={Object.keys(filterUser)}
+          contentContainerStyle={{ paddingBottom: hp(30) }}
+          numColumns={2}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item, index }) => (
+            <ProfileCard
+              name={filterUser[item].profile.name}
+              id={item}
+              url={filterUser[item].profile.pictureUrl}
+              status={filterUser[item].status}
+              index={index}
+            />
+          )}
         />
       </View>
       <FilterModal show={show} setShow={setshow} />

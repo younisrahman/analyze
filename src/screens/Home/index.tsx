@@ -8,11 +8,11 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import moment from 'moment';
-import { CheckBox, Button, FilterCard } from '../../components';
+import { useSelector } from 'react-redux';
+import { FilterCard } from '../../components';
 import { RootStackParamList } from '../../../types';
 import { Colors, hp, wp } from '../../utils';
-import { DAY_OF_WEEK } from '../../constants/constants';
+import { RootState } from '../../store';
 type HomeProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 function HomeScreen({ navigation }: HomeProps) {
   return (
@@ -23,7 +23,7 @@ function HomeScreen({ navigation }: HomeProps) {
       <Text style={styles.titleTxt}>User Analyzer</Text>
       <Text style={styles.detailsTxt}>Select filters to generate report</Text>
 
-      <FilterCard onPress={() => navigation.navigate('Results')} />
+      <FilterCard screen={'home'} />
     </View>
   );
 }

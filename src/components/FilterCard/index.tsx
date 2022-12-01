@@ -6,7 +6,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import CheckBox from '../CheckBox';
@@ -16,10 +16,21 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../../types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import moment from 'moment';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../store';
+import { setFilteredData, setFilteredDate } from '../../features';
 
-const FilterCard = ({ onPress }: { onPress: () => void }) => {
-  let time = moment().unix();
-  let sourceMoment = moment.unix(time);
+const FilterCard = ({
+  screen,
+  setShow,
+}: {
+  screen: string;
+  setShow: Dispatch<SetStateAction<boolean>>;
+}) => {
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+  // let time = moment().unix();
+  let sourceMoment = moment.unix(1454263213);
   const sourceDateTo = sourceMoment.local().toDate();
   sourceMoment = sourceMoment.subtract(1, 'months');
   const sourceDateFrom = sourceMoment.local().toDate();
@@ -32,22 +43,60 @@ const FilterCard = ({ onPress }: { onPress: () => void }) => {
   const [isCheckedSuperActive, setCheckedSuperActive] = useState(false);
   const [isCheckedBored, setCheckedBored] = useState(false);
 
+  const { users, dates } = useSelector((state: RootState) => state.AllUser);
+  const handleGenerate = () => {
+    let filteredDate = {};
+    for (const key of Object.keys(dates)) {
+      if (moment(dates[key]).isBetween(dateFrom, dateTo)) {
+        filteredDate = { ...filteredDate, [key]: dates[key] };
+      }
+    }
+
+    dispatch(setFilteredDate(filteredDate));
+
+    let filteredUsers = {};
+    for (const key of Object.keys(users)) {
+      let countBefore = Object.keys(users[key].calendar.mealIdToDayId).length;
+      let count = 0;
+      for (const mealKey of Object.keys(users[key].calendar.mealIdToDayId)) {
+        if (filteredDate[users[key].calendar.mealIdToDayId[mealKey]]) {
+          count++;
+        }
+      }
+      if (count > 10) {
+        if (isCheckedSuperActive) {
+          filteredUsers = {
+            ...filteredUsers,
+            [key]: { ...users[key], status: 'SuperActive' },
+          };
+        }
+      } else if (count < 10 && count > 4) {
+        if (isCheckedActive) {
+          filteredUsers = {
+            ...filteredUsers,
+            [key]: { ...users[key], status: 'Active' },
+          };
+        }
+      } else if (count < 5 && countBefore > 5) {
+        if (isCheckedBored) {
+          filteredUsers = {
+            ...filteredUsers,
+            [key]: { ...users[key], status: 'Bored' },
+          };
+        }
+      }
+    }
+    dispatch(setFilteredData(filteredUsers));
+    if (screen === 'home') {
+      navigation.navigate('Results');
+    } else {
+      setShow(false);
+    }
+  };
+
   const onChangeFrom = (event, selectedDate) => {
     if (Platform.OS === 'android') {
       setShowFrom(false);
-    }
-    if (event.type === 'dismissed') {
-      Alert.alert(
-        'picker was dismissed',
-        undefined,
-        [
-          {
-            text: 'great',
-          },
-        ],
-        { cancelable: true }
-      );
-      return;
     }
 
     if (event.type === 'neutralButtonPressed') {
@@ -59,19 +108,6 @@ const FilterCard = ({ onPress }: { onPress: () => void }) => {
   const onChangeTo = (event, selectedDate) => {
     if (Platform.OS === 'android') {
       setShowTo(false);
-    }
-    if (event.type === 'dismissed') {
-      Alert.alert(
-        'picker was dismissed',
-        undefined,
-        [
-          {
-            text: 'great',
-          },
-        ],
-        { cancelable: true }
-      );
-      return;
     }
 
     if (event.type === 'neutralButtonPressed') {
@@ -111,7 +147,7 @@ const FilterCard = ({ onPress }: { onPress: () => void }) => {
         {Platform.OS === 'android' ? (
           <TouchableOpacity
             style={styles.dateButton}
-            onPress={() => setShowFrom(true)}
+            onPress={() => setShowTo(true)}
           >
             <Text style={styles.dateTxt}>{dateTo.toDateString()}</Text>
           </TouchableOpacity>
@@ -148,7 +184,7 @@ const FilterCard = ({ onPress }: { onPress: () => void }) => {
       <Button
         title='Generate'
         buttonStyle={styles.buttonStyle}
-        onPress={onPress}
+        onPress={handleGenerate}
       />
       {showFrom && (
         <DateTimePicker
@@ -241,6 +277,8 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     position: 'absolute',
     left: wp(10),
+    backgroundColor: Colors.light,
+    color: Colors.light,
   },
 });
 export default FilterCard;

@@ -18,7 +18,7 @@ const FilterModal = ({ show, setShow }: FiltarModalProps) => {
         </TouchableOpacity>
       </View>
       <View style={styles.body}>
-        <FilterCard onPress={() => setShow(false)} />
+        <FilterCard screen='result' setShow={setShow} />
       </View>
     </Modal>
   );
