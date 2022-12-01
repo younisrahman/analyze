@@ -130,7 +130,7 @@ const FilterCard = ({
           >
             <Text style={styles.dateTxt}>{dateFrom.toDateString()}</Text>
           </TouchableOpacity>
-        ) : (
+        ) : Platform.OS === 'ios' ? (
           <DateTimePicker
             testID='dateTimePicker'
             value={dateFrom}
@@ -140,6 +140,10 @@ const FilterCard = ({
             dateFormat={'longdate'}
             placeholderText='select date'
           />
+        ) : (
+          <Text>
+            Web Site not Support the Date picker Please test in Mobile
+          </Text>
         )}
       </View>
       <View style={styles.dateContainer}>
@@ -151,7 +155,7 @@ const FilterCard = ({
           >
             <Text style={styles.dateTxt}>{dateTo.toDateString()}</Text>
           </TouchableOpacity>
-        ) : (
+        ) : Platform.OS === 'ios' ? (
           <DateTimePicker
             testID='dateTimePicker'
             value={dateTo}
@@ -161,6 +165,10 @@ const FilterCard = ({
             dateFormat={'longdate'}
             placeholderText='select date'
           />
+        ) : (
+          <Text>
+            Web Site not Support the Date picker Please test in Mobile
+          </Text>
         )}
       </View>
       <Text style={[styles.dividerTitleTxt, { marginTop: hp(2) }]}>Status</Text>
