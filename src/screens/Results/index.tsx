@@ -15,13 +15,34 @@ import { Colors, hp, wp } from '../../utils';
 import { TextinputWithIcon } from '../../components';
 import ProfileCard from './ProfileCard';
 import FilterModal from './FiltarModal';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 type DetailsProps = NativeStackScreenProps<RootStackParamList, 'Results'>;
 function DetailsScreen({ navigation }: DetailsProps) {
   const { filterUser } = useSelector((state: RootState) => state.FilteredUser);
   const [show, setshow] = useState(false);
+  const [searchTxt, setSearchTxt] = useState<String>();
+  const [FinalData, setFinalData] = useState(filterUser);
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      console.log('searchTerm', searchTxt);
+
+      if (!searchTxt) {
+        setFinalData(filterUser);
+      } else {
+        let finalData = {};
+        for (let i in filterUser) {
+          if (filterUser[i].profile.name.includes(searchTxt)) {
+            finalData = { ...finalData, [i]: filterUser[i] };
+            console.log(i);
+          }
+        }
+        setFinalData(finalData);
+      }
+    }, 300);
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTxt, filterUser]);
   return (
     <View style={styles.container}>
       <View style={styles.headerShadow}>
@@ -53,19 +74,21 @@ function DetailsScreen({ navigation }: DetailsProps) {
           iconLeft
           containerStyle={styles.searchContainer}
           textContainer={styles.textContainer}
+          dataText={searchTxt}
+          setText={setSearchTxt}
         />
 
         <FlatList
-          data={Object.keys(filterUser)}
+          data={Object.keys(FinalData)}
           contentContainerStyle={{ paddingBottom: hp(30) }}
           numColumns={2}
           showsVerticalScrollIndicator={false}
           renderItem={({ item, index }) => (
             <ProfileCard
-              name={filterUser[item].profile.name}
+              name={FinalData[item].profile.name}
               id={item}
-              url={filterUser[item].profile.pictureUrl}
-              status={filterUser[item].status}
+              url={FinalData[item].profile.pictureUrl}
+              status={FinalData[item].status}
               index={index}
             />
           )}
